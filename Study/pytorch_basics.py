@@ -62,3 +62,51 @@ resnet.fc = nn.Linear(resnet.fc.in_features, 100)
 images = torch.randn(64,3,224,224)
 outputs = resnet(images)
 print(outputs.size())
+
+
+print("------------------------")
+
+class NeuralNet(nn.Module) :
+    def __init__(self, input_size, hidden_size, hidden_size2, num_classes):
+        super(NeuralNet, self).__init__()
+        self.fc1 = nn.Linear(input_size, hidden_size)
+        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(hidden_size, hidden_size2)
+        self.relu2 = nn.ReLU()
+        self.fc3 = nn.Linear(hidden_size2, num_classes)
+
+    def forward(self, x) :
+        out = self.fc1(x)
+        out = self.relu(x)
+        out = self.fc2(x)
+        out = self.relu2(x)
+        out = self.fc3(x)
+        return out
+
+# Download and construct CIFAR-10 dataset.
+train_dataset = torchvision.datasets.CIFAR10(root='../data/',
+                                             train=True,
+                                             transform=transforms.ToTensor(),
+                                             download=True)
+
+# Fetch one data pair (read data from disk).
+image, label = train_dataset[0]
+print(image.size())
+print(label)
+
+# Data loader (this provides queues and threads in a very simple way).
+train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
+                                           batch_size=64,
+                                           shuffle=True)
+
+# When iteration starts, queue and thread start to load data from files.
+data_iter = iter(train_loader)
+
+# Mini-batch images and labels.
+images, labels = data_iter.next()
+
+# Actual usage of the data loader is as below.
+for images, labels in train_loader:
+
+    pass
+
