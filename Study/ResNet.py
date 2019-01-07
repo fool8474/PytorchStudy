@@ -4,7 +4,7 @@ import torchvision
 import torchvision.transforms as transforms
 
 #Device configuration
-#device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Hyper-parameters
 num_epochs = 80
@@ -56,6 +56,7 @@ class ResidualBlock(nn.Module):
         self.conv2 = conv3x3(out_channels, out_channels)
         self.bn2 = nn.BatchNorm2d(out_channels)
         self.downsample = downsample
+        # ここでsize等を正義
 
     def forward(self, x):
         residual = x
@@ -69,6 +70,7 @@ class ResidualBlock(nn.Module):
         out += residual
         out = self.relu(out)
         return out
+        # オリジナル形のResidualブロック
 
 
 # ResNet
@@ -82,8 +84,11 @@ class ResNet(nn.Module):
         self.layer1 = self.make_layer(block, 16, layers[0])
         self.layer2 = self.make_layer(block, 32, layers[1], 2)
         self.layer3 = self.make_layer(block, 64, layers[2], 2)
+        self.layer4 = self.make_layer(block, 128, layers[3],2)
+        self.layer5 = self.make_layer(block, 256, layers[4], 2)
+        self.layer6 = self.make_layer(block, 256, layers[5], 2)
         self.avg_pool = nn.AvgPool2d(8)
-        self.fc = nn.Linear(64, num_classes)
+        self.fc = nn.Linear(256, num_classes)
 
     def make_layer(self, block, out_channels, blocks, stride=1):
         downsample = None
@@ -105,13 +110,16 @@ class ResNet(nn.Module):
         out = self.layer1(out)
         out = self.layer2(out)
         out = self.layer3(out)
+        out = self.layer4(out)
+        out = self.layer5(out)
+        out = self.layer6(out)
         out = self.avg_pool(out)
-        out = out.view(out.size(0), -1)
+        out = out.view(out.size(0), -1)  # 変数を-1に調整すれば自動的にdimensionをresizeする。
         out = self.fc(out)
         return out
 
 
-model = ResNet(ResidualBlock, [2, 2, 2]).cuda()
+model = ResNet(ResidualBlock, [2, 2, 2, 2, 2, 2]).to(device)
 
 # Loss and optimizer
 criterion = nn.CrossEntropyLoss()
@@ -129,8 +137,8 @@ total_step = len(train_loader)
 curr_lr = learning_rate
 for epoch in range(num_epochs):
     for i, (images, labels) in enumerate(train_loader):
-        images = images.cuda()
-        labels = labels.cuda()
+        images = images.to(device)
+        labels = labels.to(device)
 
         # Forward pass
         outputs = model(images)
@@ -156,8 +164,8 @@ with torch.no_grad():
     correct = 0
     total = 0
     for images, labels in test_loader:
-        images = images.cuda()
-        labels = labels.cuda()
+        images = images.to(device)
+        labels = labels.to(device)
         outputs = model(images)
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
