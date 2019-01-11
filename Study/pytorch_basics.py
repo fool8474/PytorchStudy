@@ -107,6 +107,5 @@ images, labels = data_iter.next()
 
 # Actual usage of the data loader is as below.
 for images, labels in train_loader:
-
     pass
 

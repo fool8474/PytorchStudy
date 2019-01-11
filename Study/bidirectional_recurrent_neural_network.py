@@ -11,16 +11,16 @@ hidden_size = 128
 num_layers = 2
 num_classes = 10
 batch_size = 100
-num_epochs = 2
+num_epochs = 5
 learning_rate = 0.003
 
-train_dataset = torchvision.datasets.MNIST(root = '../data/',
-                                           train = True,
+train_dataset = torchvision.datasets.MNIST(root='../data/',
+                                           train=True,
                                            transform=transforms.ToTensor(),
                                            download=True)
 
-test_dataset = torchvision.datasets.MNIST(root = '../data/',
-                                          train = False,
+test_dataset = torchvision.datasets.MNIST(root='../data/',
+                                          train=False,
                                           transform=transforms.ToTensor())
 
 train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
@@ -38,13 +38,16 @@ class BiRNN(nn.Module):
         super(BiRNN, self).__init__()
         self.hidden_size = hidden_size
         self.num_layers = num_layers
-        self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True, bidirectional=True)
+        self.lstm = nn.LSTM(input_size, hidden_size, num_layers,
+                            batch_first=True,  # If True, then the input and output tensors are provided as (batch, seq, feature).
+                            bidirectional=True  # If True, becomes a bidirectional LSTM
+                            )
         self.fc = nn.Linear(hidden_size*2, num_classes)  # 2 for bidirection
 
     def forward(self, x):
         # Set initial states
         h0 = torch.zeros(self.num_layers*2, x.size(0), self.hidden_size).to(device)
-        c0 = torch.zeros(self.num_layers*2, x.size(0), self.hidden_size).to(device)
+        c0 = torch.zeros(self.num_layers*2, x.size(0), self.hidden_size).to(device) # Generate zero Tensor
 
         # Forward propagate LSTM
         out, _ = self.lstm(x, (h0, c0))  # out : tensor of shape (batch_size, seq_length, hidden_size*2)
@@ -57,11 +60,11 @@ class BiRNN(nn.Module):
 model = BiRNN(input_size, hidden_size, num_layers, num_classes).to(device)
 
 criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr = learning_rate)
+optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 total_step = len(train_loader)
-for epoch in range(num_epochs) :
-    for i, (images, labels) in enumerate(train_loader) :
+for epoch in range(num_epochs):
+    for i, (images, labels) in enumerate(train_loader):
         images = images.reshape(-1, sequence_length, input_size).to(device)
         labels = labels.to(device)
 
@@ -73,12 +76,12 @@ for epoch in range(num_epochs) :
         optimizer.step()
 
         if (i+1) % 100 == 0:
-            print('Epoch [{}/{}], Step [{}/{}], Loss : {:.4f}'.format(epoch+1,num_epochs,i+1,total_step,loss.item()))
+            print('Epoch [{}/{}], Step [{}/{}], Loss : {:.4f}'.format(epoch+1, num_epochs, i+1, total_step, loss.item()))
 
-with torch.no_grad() :
+with torch.no_grad():
     correct = 0
     total = 0
-    for images, labels in test_loader :
+    for images, labels in test_loader:
         images = images.reshape(-1, sequence_length, input_size).to(device)
         labels = labels.to(device)
         outputs = model(images)
@@ -90,3 +93,4 @@ with torch.no_grad() :
 
     # Save the model checkpoint
 torch.save(model.state_dict(), 'model.ckpt')
+
