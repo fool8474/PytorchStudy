@@ -84,12 +84,12 @@ class NeuralNet(nn.Module) :
         return out
 
 # Download and construct CIFAR-10 dataset.
-train_dataset = torchvision.datasets.CIFAR10(root='../data/',
+train_dataset = torchvision.datasets.CIFAR10(root='../MNIST/',
                                              train=True,
                                              transform=transforms.ToTensor(),
                                              download=True)
 
-# Fetch one data pair (read data from disk).
+# Fetch one MNIST pair (read MNIST from disk).
 image, label = train_dataset[0]
 print(image.size())
 print(label)
@@ -99,13 +99,13 @@ train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
                                            batch_size=64,
                                            shuffle=True)
 
-# When iteration starts, queue and thread start to load data from files.
+# When iteration starts, queue and thread start to load MNIST from files.
 data_iter = iter(train_loader)
 
 # Mini-batch images and labels.
 images, labels = data_iter.next()
 
-# Actual usage of the data loader is as below.
+# Actual usage of the MNIST loader is as below.
 for images, labels in train_loader:
     pass
 

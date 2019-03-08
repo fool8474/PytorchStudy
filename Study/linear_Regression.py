@@ -42,7 +42,7 @@ for epoch in range(num_epochs) :
         print("Epoch [{}/{}], Loss : {:.4f}".format(epoch+1, num_epochs, loss.item()))
 
 predicted = model(torch.from_numpy(x_train)).detach().numpy()
-plt.plot(x_train, y_train, 'ro', label='Original data')
+plt.plot(x_train, y_train, 'ro', label='Original MNIST')
 plt.plot(x_train, predicted, label="Fitted line")
 plt.legend()
 plt.show()

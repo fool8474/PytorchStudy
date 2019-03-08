@@ -14,8 +14,8 @@ content_layer_num = 1
 image_size = 256
 epoch = 5000
 
-content_dir = "../data/image/content/Neckarfront_origin.jpg"
-style_dir = "../data/image/style/StarryNight.jpg"
+content_dir = "../MNIST/image/content/Neckarfront_origin.jpg"
+style_dir = "../MNIST/image/style/StarryNight.jpg"
 
 def image_preprocess(img_dir):
     img = Image.open(img_dir)

@@ -13,12 +13,12 @@ num_epochs = 5
 batch_size = 100
 learning_rate = 0.001
 
-train_dataset = torchvision.datasets.MNIST(root='../data',
+train_dataset = torchvision.datasets.MNIST(root='../MNIST',
                                            train=True,  # True : training.ptからデータセットを作る
                                            transform=transforms.ToTensor(),  # PIL(Python Imaging Librarg)をもらって変形された形でリターンする。
                                            download=True)  # データセットをネットからダウンロードします。
 
-test_dataset = torchvision.datasets.MNIST(root='../data',
+test_dataset = torchvision.datasets.MNIST(root='../MNIST',
                                           train=False,
                                           transform=transforms.ToTensor())
 
